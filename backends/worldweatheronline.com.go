@@ -73,8 +73,8 @@ type wwoConfig struct {
 }
 
 const (
-	wwoSuri = "https://api.worldweatheronline.com/free/v2/search.ashx?"
-	wwoWuri = "https://api.worldweatheronline.com/free/v2/weather.ashx?"
+	wwoSuri = "https://api.worldweatheronline.com/premium/v1/search.ashx?"
+	wwoWuri = "https://api.worldweatheronline.com/premium/v1/weather.ashx?"
 )
 
 func wwoParseCond(cond wwoCond, date time.Time) (ret iface.Cond) {
@@ -305,16 +305,18 @@ func (c *wwoConfig) Fetch(loc string, numdays int) iface.Data {
 	if len(c.apiKey) == 0 {
 		log.Fatal("No API key specified. Setup instructions are in the README.")
 	}
+
 	params = append(params, "key="+c.apiKey)
 
 	if len(loc) > 0 {
-		params = append(params, "q="+url.QueryEscape(loc))
+		params = append(params, "query="+url.QueryEscape(loc))
 	}
 	params = append(params, "format=json")
-	params = append(params, "num_of_days="+strconv.Itoa(numdays))
-	params = append(params, "tp=3")
 
 	go c.getCoordinatesFromAPI(params, coordChan)
+
+	params = append(params, "num_of_days="+strconv.Itoa(numdays))
+	params = append(params, "tp=3")
 
 	if c.language != "" {
 		params = append(params, "lang="+c.language)
